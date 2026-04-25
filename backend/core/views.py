@@ -6,7 +6,14 @@ import logging
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+from django.conf import settings
 import json
+import io
+import mimetypes
+import pypdf
+import docx
+from google import genai
+from google.genai import types
 
 from core.models import Session
 from services import skill_extractor, gap_analyser, assessment_agent, scoring_engine, plan_generator
@@ -185,4 +192,60 @@ def get_results(request, session_id):
         return JsonResponse({"error": "Session not found."}, status=404)
     except Exception as e:
         logger.exception("get_results error")
+        return JsonResponse({"error": str(e)}, status=500)
+
+
+# ── POST /api/extract-text/ ──────────────────────────────────────────────────
+
+@csrf_exempt
+@require_http_methods(["POST", "OPTIONS"])
+def extract_text_view(request):
+    if request.method == "OPTIONS":
+        return JsonResponse({}, status=200)
+    try:
+        if 'file' not in request.FILES:
+            return JsonResponse({"error": "No file uploaded."}, status=400)
+        
+        uploaded_file = request.FILES['file']
+        file_name = uploaded_file.name.lower()
+        file_content = uploaded_file.read()
+        
+        text = ""
+        
+        if file_name.endswith('.pdf'):
+            reader = pypdf.PdfReader(io.BytesIO(file_content))
+            for page in reader.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        elif file_name.endswith('.docx'):
+            doc = docx.Document(io.BytesIO(file_content))
+            for para in doc.paragraphs:
+                text += para.text + "\n"
+        elif file_name.endswith(('.png', '.jpg', '.jpeg', '.webp')):
+            # Use Gemini to extract text from images
+            key = settings.GEMINI_API_KEY
+            if not key:
+                raise RuntimeError("GEMINI_API_KEY is not set.")
+            client = genai.Client(api_key=key)
+            mime_type, _ = mimetypes.guess_type(file_name)
+            if not mime_type:
+                mime_type = "image/jpeg"
+                
+            image_part = types.Part.from_bytes(data=file_content, mime_type=mime_type)
+            response = client.models.generate_content(
+                model="gemini-2.5-flash-lite",
+                contents=["Extract and return all the readable text from this image as raw text. Do not add any conversational filler. Structure it exactly as it appears in the image.", image_part]
+            )
+            text = response.text
+        else:
+            # Fallback for plain text
+            try:
+                text = file_content.decode('utf-8')
+            except UnicodeDecodeError:
+                return JsonResponse({"error": "Unsupported file format. Please upload a PDF, DOCX, TXT, or Image file."}, status=400)
+        
+        return JsonResponse({"text": text.strip()})
+    except Exception as e:
+        logger.exception("extract_text error")
         return JsonResponse({"error": str(e)}, status=500)

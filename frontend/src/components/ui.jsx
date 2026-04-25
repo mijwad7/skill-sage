@@ -112,6 +112,8 @@ export function Card({ children, style = {}, className = "" }) {
 /* ── Textarea with file-drop ──────────────────────────────────────────────── */
 export function TextArea({ label, value, onChange, placeholder, hint, minRows = 8 }) {
   const [dragging, setDragging] = useState(false);
+  const [extracting, setExtracting] = useState(false);
+  const [extractError, setExtractError] = useState("");
   const inputRef = useRef();
 
   const handleDrop = (e) => {
@@ -121,10 +123,33 @@ export function TextArea({ label, value, onChange, placeholder, hint, minRows = 
     if (file) readFile(file);
   };
 
-  const readFile = (file) => {
-    const reader = new FileReader();
-    reader.onload = (e) => onChange(e.target.result);
-    reader.readAsText(file);
+  const readFile = async (file) => {
+    setExtractError("");
+    
+    // If it's a binary/complex file, use the backend API to extract text
+    if (file.name.match(/\.(pdf|docx|png|jpg|jpeg|webp)$/i)) {
+      setExtracting(true);
+      try {
+        const { api } = await import("../api/client");
+        const data = await api.extractText(file);
+        if (data.text) {
+          onChange((prev) => prev ? prev + "\n\n" + data.text : data.text);
+        } else {
+          setExtractError("No text found in file.");
+        }
+      } catch (e) {
+        setExtractError(e.message || "Failed to extract text from file.");
+      } finally {
+        setExtracting(false);
+      }
+    } else {
+      // Otherwise fallback to standard plain-text read
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        onChange((prev) => prev ? prev + "\n\n" + e.target.result : e.target.result);
+      };
+      reader.readAsText(file);
+    }
   };
 
   return (
@@ -134,14 +159,25 @@ export function TextArea({ label, value, onChange, placeholder, hint, minRows = 
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
+          disabled={extracting}
           style={{
             fontSize: 12, color: "var(--purple-l)", background: "none",
-            border: "none", cursor: "pointer", padding: 0,
+            border: "none", cursor: extracting ? "not-allowed" : "pointer", padding: 0,
+            display: "flex", alignItems: "center", gap: 6, opacity: extracting ? 0.6 : 1
           }}
         >
-          Upload file ↑
+          {extracting ? <><Spinner size={12} /> Extracting…</> : "Upload file ↑"}
         </button>
-        <input ref={inputRef} type="file" accept=".txt,.md" hidden onChange={e => e.target.files[0] && readFile(e.target.files[0])} />
+        <input 
+          ref={inputRef} 
+          type="file" 
+          accept=".txt,.md,.pdf,.docx,.png,.jpg,.jpeg,.webp" 
+          hidden 
+          onChange={e => {
+            if (e.target.files[0]) readFile(e.target.files[0]);
+            e.target.value = ""; // Reset input so same file can be uploaded again
+          }} 
+        />
       </div>
       <textarea
         value={value}

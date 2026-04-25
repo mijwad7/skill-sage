@@ -32,4 +32,17 @@ export const api = {
   /** Get final results once status === 'complete' */
   getResults: (sessionId) =>
     request(`/api/sessions/${sessionId}/results/`),
+
+  /** Upload file to extract text */
+  extractText: async (file) => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${BASE}/api/extract-text/`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
+    return data;
+  },
 };
