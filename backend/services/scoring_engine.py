@@ -20,27 +20,11 @@ def _compute_skill_score(skill: str, history: list, session) -> int:
     if not history:
         return 0
 
-    # 1. Resume confidence (0–100)
-    confidence   = get_resume_confidence(skill, session.resume_skills)
-    resume_score = confidence * 100
-
-    # 2. Assessment performance (0–100)
-    qa_scores        = [h["score"] for h in history]
+    # Base the score entirely on assessment performance to match user expectations
+    qa_scores = [h["score"] for h in history]
     assessment_score = (sum(qa_scores) / len(qa_scores)) * 10  # 1–10 → 0–100
 
-    # 3. Consistency (0–100) — low stdev = consistent answers
-    if len(qa_scores) > 1:
-        stdev = statistics.stdev(qa_scores)
-        consistency_score = max(0, 100 - (stdev * 15))
-    else:
-        consistency_score = 70  # neutral for single-question skills
-
-    final = (
-        resume_score      * 0.20 +
-        assessment_score  * 0.65 +
-        consistency_score * 0.15
-    )
-    return round(final)
+    return round(assessment_score)
 
 
 def score_band(score: int) -> str:
