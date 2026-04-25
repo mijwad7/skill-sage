@@ -1,19 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
-import { Shell, Card, Button, ProgressBar, ScoreRing, ErrorBanner, Spinner } from "../components/ui";
-import {
-  RadarChart, PolarGrid, PolarAngleAxis, Radar,
-  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Cell,
-} from "recharts";
+import { Spinner } from "../components/ui";
 
 export default function ResultsPage() {
   const { sessionId } = useParams();
-  const navigate      = useNavigate();
-  const [data,    setData]    = useState(null);
+  const navigate = useNavigate();
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error,   setError]   = useState("");
-  const [openPlan, setOpenPlan] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     api.getResults(sessionId)
@@ -24,285 +19,146 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <Shell>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: 400, gap: 16 }}>
-          <Spinner size={32} />
-          <p style={{ color: "var(--text2)", fontSize: 14 }}>Generating your personalised learning plan…</p>
-        </div>
-      </Shell>
+      <div style={{ minHeight: "100vh", background: "#060608", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text2)" }}>
+        <Spinner size={32} />
+        <span style={{ marginLeft: 16 }}>Generating your personalised learning plan…</span>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Shell>
-        <ErrorBanner message={error} />
-        <Button onClick={() => navigate("/")} style={{ marginTop: 16 }}>← Start over</Button>
-      </Shell>
+      <div style={{ minHeight: "100vh", background: "#060608", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "var(--red-l)" }}>
+        <div style={{ padding: 24, background: "rgba(220,38,38,0.1)", border: "1px solid var(--red)", borderRadius: 12 }}>{error}</div>
+        <button onClick={() => navigate("/")} style={{ marginTop: 24, padding: "10px 20px", background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: "#fff", borderRadius: 8, cursor: "pointer" }}>← Start over</button>
+      </div>
     );
   }
 
   const { scored_skills = [], learning_plan = [], summary = {} } = data || {};
-  const radarData = scored_skills.map(s => ({ subject: s.skill, score: s.score, fullMark: 100 }));
-  const bandColors = { Expert: "#7c3aed", Proficient: "#0d9488", Developing: "#d97706", Beginner: "#dc2626" };
+
+  // Find strongest and weakest skills based on actual scores
+  const sortedSkills = [...scored_skills].sort((a, b) => b.score - a.score);
+  const topStrength = sortedSkills[0] || { skill: "N/A", band: "N/A" };
+  const biggestGap = sortedSkills[sortedSkills.length - 1] || { skill: "N/A", band: "N/A" };
 
   return (
-    <Shell maxWidth={820}>
-      <div className="animate-fade-up">
+    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", fontFamily: "var(--font)", paddingBottom: 80, position: "relative", overflowX: "hidden" }}>
+      {/* Background Glows */}
+      <div style={{ position: "absolute", top: -100, left: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--purple) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />
+      <div style={{ position: "absolute", bottom: -200, right: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--cyan) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />
 
-        {/* Page header */}
-        <div style={{ marginBottom: 36 }}>
-          <div style={{ fontSize: 12, color: "var(--text3)", fontFamily: "var(--mono)", marginBottom: 8 }}>
-            Assessment complete
-          </div>
-          <h1 style={{ fontSize: 30, fontWeight: 600, letterSpacing: "-0.02em", marginBottom: 8 }}>
-            Your results
-          </h1>
-          <p style={{ fontSize: 14, color: "var(--text2)" }}>
-            Based on your resume and assessment performance across {summary.total_skills} skills.
-          </p>
+      {/* Header */}
+      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 40px", borderBottom: "1px solid var(--glass-border)", background: "rgba(6,6,8,0.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, var(--purple), var(--pink))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: 12 }}>S</div>
+          <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>SkillSage</span>
         </div>
-
-        {/* Summary cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 28 }}>
-          {[
-            { label: "Average score", value: `${summary.avg_score}/100` },
-            { label: "Strongest skill", value: summary.strongest || "—" },
-            { label: "Biggest gap",    value: summary.weakest   || "—" },
-          ].map(({ label, value }) => (
-            <div key={label} style={{
-              background: "var(--bg2)", border: "1px solid var(--border)",
-              borderRadius: "var(--radius)", padding: "16px 20px",
-            }}>
-              <div style={{ fontSize: 11, color: "var(--text3)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>{label}</div>
-              <div style={{ fontSize: 22, fontWeight: 600, color: "var(--text)" }}>{value}</div>
-            </div>
-          ))}
+        <div style={{ display: "flex", gap: 16 }}>
+          <button onClick={() => window.print()} style={{ background: "linear-gradient(90deg, #9333ea, #d946ef)", border: "none", borderRadius: 6, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 0 15px rgba(168,85,247,0.4)" }}>
+            <span style={{ fontSize: 16 }}>↓</span> Download PDF Report
+          </button>
+          <button style={{ background: "linear-gradient(90deg, #3b82f6, #06b6d4)", border: "none", borderRadius: 6, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 0 15px rgba(59,130,246,0.4)" }}>
+            Share Profile
+          </button>
         </div>
+      </header>
 
-        {/* Charts row */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 28 }}>
-          {/* Radar */}
-          <Card style={{ padding: "20px" }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: "var(--text2)" }}>Skill radar</div>
-            <ResponsiveContainer width="100%" height={220}>
-              <RadarChart data={radarData}>
-                <PolarGrid stroke="var(--border)" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: "var(--text2)", fontSize: 11 }} />
-                <Radar name="Score" dataKey="score" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.2} strokeWidth={2} />
-              </RadarChart>
-            </ResponsiveContainer>
-          </Card>
-
-          {/* Bar chart */}
-          <Card style={{ padding: "20px" }}>
-            <div style={{ fontSize: 13, fontWeight: 600, marginBottom: 16, color: "var(--text2)" }}>Score breakdown</div>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={scored_skills} layout="vertical" margin={{ left: 0, right: 16 }}>
-                <XAxis type="number" domain={[0, 100]} tick={{ fill: "var(--text3)", fontSize: 11 }} axisLine={false} tickLine={false} />
-                <YAxis type="category" dataKey="skill" tick={{ fill: "var(--text2)", fontSize: 11 }} axisLine={false} tickLine={false} width={90} />
-                <Tooltip
-                  contentStyle={{ background: "var(--bg2)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }}
-                  formatter={(v) => [`${v}/100`, "Score"]}
-                />
-                <Bar dataKey="score" radius={[0, 4, 4, 0]} maxBarSize={18}>
-                  {scored_skills.map((s, i) => (
-                    <Cell key={i} fill={bandColors[s.band] || "#7c3aed"} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </Card>
-        </div>
-
-        {/* Skill score cards */}
-        <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 14 }}>Skill scores</h2>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 12, marginBottom: 36 }}>
-          {scored_skills.map((s, i) => (
-            <Card key={s.skill} style={{ padding: "16px 20px", animationDelay: `${i * 0.05}s` }} className="animate-fade-up">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 4 }}>{s.skill}</div>
-                  <span style={{
-                    fontSize: 11, padding: "2px 8px", borderRadius: 99, fontWeight: 500,
-                    background: `${bandColors[s.band]}22`,
-                    color: bandColors[s.band],
-                  }}>{s.band}</span>
-                </div>
-                <ScoreRing score={s.score} size={56} />
-              </div>
-              <ProgressBar pct={s.score} color={bandColors[s.band]} />
-              {/* Q&A history preview */}
-              {s.history?.length > 0 && (
-                <div style={{ marginTop: 10, fontSize: 11, color: "var(--text3)" }}>
-                  {s.history.length} question{s.history.length > 1 ? "s" : ""} · avg {Math.round(s.history.reduce((a, h) => a + h.score, 0) / s.history.length * 10)}/100
-                </div>
-              )}
-            </Card>
-          ))}
-        </div>
-
-        {/* Learning plan */}
-        {learning_plan.length > 0 && (
-          <>
-            <h2 style={{ fontSize: 16, fontWeight: 600, marginBottom: 6 }}>Learning roadmap</h2>
-            <p style={{ fontSize: 13, color: "var(--text2)", marginBottom: 16 }}>
-              Ranked by priority. Each plan is tailored to your current level.
-            </p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 40 }}>
-              {learning_plan.map((plan, i) => (
-                <PlanCard
-                  key={plan.skill}
-                  plan={plan}
-                  index={i}
-                  open={openPlan === plan.skill}
-                  onToggle={() => setOpenPlan(openPlan === plan.skill ? null : plan.skill)}
-                />
-              ))}
-            </div>
-          </>
-        )}
-
-        {/* Footer actions */}
-        <div style={{ display: "flex", gap: 12, justifyContent: "center", paddingTop: 8 }}>
-          <Button variant="ghost" onClick={() => navigate("/")}>← Start new assessment</Button>
-          <Button onClick={() => window.print()}>Download results ↓</Button>
-        </div>
-
-      </div>
-    </Shell>
-  );
-}
-
-/* ── Learning plan card (accordion) ─────────────────────────────────────────── */
-function PlanCard({ plan, index, open, onToggle }) {
-  const priorityColor = { high: "#dc2626", medium: "#d97706", low: "#059669" };
-  const pColor = priorityColor[plan.priority] || "#7c3aed";
-
-  return (
-    <Card
-      style={{ padding: 0, overflow: "hidden", animationDelay: `${index * 0.06}s` }}
-      className="animate-fade-up"
-    >
-      {/* Header (always visible) */}
-      <button
-        onClick={onToggle}
-        style={{
-          width: "100%", background: "none", border: "none", cursor: "pointer",
-          padding: "18px 24px", display: "flex", alignItems: "center",
-          justifyContent: "space-between", textAlign: "left",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <div style={{ textAlign: "center", minWidth: 44 }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", lineHeight: 1 }}>{plan.current_score}</div>
-            <div style={{ fontSize: 10, color: "var(--text3)" }}>/ 100</div>
-          </div>
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{plan.skill}</span>
-              <span style={{
-                fontSize: 10, padding: "1px 7px", borderRadius: 99, fontWeight: 600,
-                background: `${pColor}22`, color: pColor,
-                textTransform: "uppercase", letterSpacing: ".05em",
-              }}>{plan.priority}</span>
-            </div>
-            <div style={{ fontSize: 12, color: "var(--text2)" }}>
-              {plan.current_band} · {plan.weeks_needed} week{plan.weeks_needed > 1 ? "s" : ""} to proficiency
-            </div>
-          </div>
-        </div>
-        <div style={{ color: "var(--text3)", fontSize: 18, transition: "transform 0.2s", transform: open ? "rotate(90deg)" : "rotate(0)" }}>
-          ›
-        </div>
-      </button>
-
-      {/* Expanded body */}
-      {open && (
-        <div className="animate-fade-in" style={{ borderTop: "1px solid var(--border)", padding: "20px 24px" }}>
-
-          {/* Weekly goals */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>
-              Weekly goals
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-              {(plan.weekly_goals || []).map((goal, i) => (
-                <div key={i} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-                  <div style={{
-                    width: 20, height: 20, borderRadius: 4, flexShrink: 0, marginTop: 1,
-                    background: "rgba(124,58,237,0.12)", border: "1px solid rgba(124,58,237,0.25)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 10, color: "var(--purple-l)", fontWeight: 600,
-                  }}>{i + 1}</div>
-                  <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>{goal}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mini project */}
-          {plan.mini_project && (
-            <div style={{ marginBottom: 20 }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 8, textTransform: "uppercase", letterSpacing: ".06em" }}>
-                Capstone project
-              </div>
-              <div style={{
-                background: "rgba(124,58,237,0.07)",
-                border: "1px solid rgba(124,58,237,0.2)",
-                borderRadius: "var(--radius)",
-                padding: "12px 16px",
-                fontSize: 13,
-                color: "var(--text)",
-                lineHeight: 1.55,
-              }}>
-                🛠 {plan.mini_project}
-              </div>
-            </div>
-          )}
-
-          {/* Resources */}
-          {plan.resources?.length > 0 && (
+      <main style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px", position: "relative", zIndex: 1 }}>
+        
+        {/* Top Summary Row */}
+        <div className="animate-fade-up" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 40, marginBottom: 60 }}>
+          {/* Top Strength */}
+          <div className="glass-card" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(34,211,238,0.1)", border: "1px solid rgba(34,211,238,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>⚛️</div>
             <div>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 10, textTransform: "uppercase", letterSpacing: ".06em" }}>
-                Resources
-              </div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                {plan.resources.map((r, i) => (
-                  <a
-                    key={i}
-                    href={r.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      display: "flex", alignItems: "center", gap: 10,
-                      background: "var(--bg3)", border: "1px solid var(--border)",
-                      borderRadius: "var(--radius-sm)", padding: "10px 14px",
-                      color: "var(--text)", textDecoration: "none",
-                      transition: "border-color 0.15s",
-                    }}
-                    onMouseEnter={e => (e.currentTarget.style.borderColor = "var(--border2)")}
-                    onMouseLeave={e => (e.currentTarget.style.borderColor = "var(--border)")}
-                  >
-                    <span style={{ fontSize: 14 }}>{typeIcon(r.type)}</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: 13, fontWeight: 500 }}>{r.title}</div>
-                      <div style={{ fontSize: 11, color: "var(--text3)", fontFamily: "var(--mono)" }}>
-                        {r.url.replace(/^https?:\/\//, "").split("/")[0]}
-                      </div>
-                    </div>
-                    <span style={{ fontSize: 11, color: "var(--text3)" }}>↗</span>
-                  </a>
-                ))}
-              </div>
+              <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Top Strength</div>
+              <div style={{ fontSize: 16, fontWeight: 600 }}>{topStrength.skill} ({topStrength.band})</div>
             </div>
-          )}
-        </div>
-      )}
-    </Card>
-  );
-}
+          </div>
 
-function typeIcon(type) {
-  return { video: "▶", docs: "📄", course: "🎓", book: "📚" }[type] || "🔗";
+          {/* Average Score Ring */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: 180, height: 180, borderRadius: "50%", background: "var(--glass-bg)", border: "4px solid rgba(168,85,247,0.3)", position: "relative", boxShadow: "0 0 40px rgba(168,85,247,0.2)" }}>
+             {/* Simulated ring progress */}
+             <div style={{ position: "absolute", top: -4, left: -4, right: -4, bottom: -4, borderRadius: "50%", border: "4px solid transparent", borderTopColor: "var(--pink)", borderRightColor: "var(--purple)", transform: `rotate(${Math.min(summary.avg_score || 0, 100) * 3.6 - 90}deg)`, transition: "transform 1s var(--ease)" }} />
+             <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Avg Score</div>
+             <div style={{ fontSize: 42, fontWeight: 800, lineHeight: 1 }}>{summary.avg_score || 0}<span style={{ fontSize: 24, color: "var(--text3)" }}>%</span></div>
+          </div>
+
+          {/* Biggest Gap */}
+          <div className="glass-card" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
+            <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(244,114,182,0.1)", border: "1px solid rgba(244,114,182,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📉</div>
+            <div>
+              <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Biggest Gap</div>
+              <div style={{ fontSize: 16, fontWeight: 600 }}>{biggestGap.skill} ({biggestGap.band})</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skill Proficiency Breakdown */}
+        <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 20 }}>Skill Proficiency Breakdown</h2>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16, marginBottom: 60 }}>
+          {scored_skills.map((skill, i) => {
+            const colors = { Expert: "var(--purple-l)", Proficient: "var(--cyan)", Developing: "var(--amber-l)", Beginner: "var(--red-l)" };
+            const color = colors[skill.band] || "var(--purple)";
+            return (
+              <div key={skill.skill} className="glass-card animate-fade-up" style={{ animationDelay: `${i * 0.05}s`, padding: "20px 24px", borderRadius: 16 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 12 }}>
+                  <div style={{ fontSize: 16, fontWeight: 600 }}>{skill.skill}</div>
+                  <div style={{ fontSize: 12, color: "var(--text2)" }}>Score: {skill.score}%</div>
+                </div>
+                <div style={{ height: 4, background: "rgba(255,255,255,0.1)", borderRadius: 99, marginBottom: 16, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${skill.score}%`, background: color, borderRadius: 99, boxShadow: `0 0 10px ${color}` }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: 11, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Skill Band</div>
+                  <div style={{ fontSize: 13, color, fontWeight: 500, display: "inline-flex", alignItems: "center", gap: 6, padding: "2px 10px", background: `${color}15`, border: `1px solid ${color}30`, borderRadius: 99 }}>
+                    {skill.band}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 8-Week Roadmap */}
+        {learning_plan.length > 0 && (
+          <div>
+            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 20 }}>Personalized Learning Roadmap</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 20 }}>
+              {learning_plan.map((plan, i) => (
+                <div key={plan.skill} className="glass-card animate-fade-up" style={{ animationDelay: `${i * 0.1}s`, padding: 24, borderRadius: 16, borderLeft: `4px solid var(--purple)`, position: "relative" }}>
+                  <div style={{ fontSize: 12, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>
+                    Week {i + 1} • {plan.skill}
+                  </div>
+                  <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, lineHeight: 1.4 }}>Focus: {plan.current_band} to Proficiency</h3>
+                  
+                  {plan.weekly_goals && plan.weekly_goals.length > 0 && (
+                    <div style={{ marginBottom: 16 }}>
+                       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 6 }}>Key Goal</div>
+                       <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>{plan.weekly_goals[0]}</div>
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {plan.resources && plan.resources.map((r, j) => (
+                      <a key={j} href={r.url} target="_blank" rel="noreferrer" style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12, color: "var(--text2)", textDecoration: "none", transition: "color 0.2s" }} onMouseOver={e => e.currentTarget.style.color = "#fff"} onMouseOut={e => e.currentTarget.style.color = "var(--text2)"}>
+                        <span style={{ color: "var(--purple-l)" }}>▶</span> {r.title}
+                      </a>
+                    ))}
+                    {plan.mini_project && (
+                      <div style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 12, color: "var(--text2)", marginTop: 4 }}>
+                        <span style={{ color: "var(--cyan)" }}>★</span>
+                        <span style={{ lineHeight: 1.5 }}>Project: {plan.mini_project}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }
