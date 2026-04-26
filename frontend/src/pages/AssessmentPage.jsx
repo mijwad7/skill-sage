@@ -3,6 +3,19 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { Spinner } from "../components/ui";
 
+function LoadingSequence({ steps }) {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep(s => Math.min(s + 1, steps.length - 1));
+    }, 2500);
+    return () => clearInterval(interval);
+  }, [steps]);
+
+  return <span className="animate-fade-up" key={step} style={{ marginLeft: 8, fontSize: 13, color: "var(--text2)", fontStyle: "italic" }}>{steps[step]}</span>;
+}
+
 export default function AssessmentPage() {
   const { sessionId } = useParams();
   const { state } = useLocation();
@@ -312,10 +325,21 @@ export default function AssessmentPage() {
               {typing && (
                 <div className="animate-fade-up" style={{ display: "flex", alignItems: "flex-start", gap: 16 }}>
                   <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--purple-l)", fontSize: 12, fontWeight: 700 }}>AI</div>
-                  <div style={{ padding: "16px 20px", background: "var(--glass-bg)", border: "1px solid var(--glass-border)", borderRadius: "0 16px 16px 16px", display: "flex", alignItems: "center", gap: 6 }}>
+                  <div style={{ padding: "12px 16px", background: "var(--glass-bg)", border: "1px solid var(--glass-border)", borderRadius: "0 16px 16px 16px", display: "flex", alignItems: "center", gap: 6 }}>
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--purple-l)", animation: "pulse 1.2s infinite" }} />
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cyan)", animation: "pulse 1.2s 0.2s infinite" }} />
                     <div style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--pink)", animation: "pulse 1.2s 0.4s infinite" }} />
+                    <LoadingSequence steps={
+                      progress?.current === progress?.total ? [
+                        "Evaluating final response...",
+                        "Synthesizing skill data...",
+                        "Building personalized roadmap..."
+                      ] : [
+                        "Analyzing response...",
+                        "Adapting interview logic...",
+                        "Generating next question..."
+                      ]
+                    } />
                   </div>
                 </div>
               )}

@@ -1,8 +1,28 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { Button, TextArea, ErrorBanner, Spinner } from "../components/ui";
 import heroNetwork from "../assets/hero_network.png";
+
+const UPLOAD_LOADING_STEPS = [
+  "Parsing resume claims...",
+  "Mapping role requirements...",
+  "Designing adaptive interview..."
+];
+
+function LoadingSequence({ steps }) {
+  const [step, setStep] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStep(s => Math.min(s + 1, steps.length - 1));
+    }, 2500); // switch every 2.5s
+    return () => clearInterval(interval);
+  }, [steps]);
+
+  return <span className="animate-fade-up" key={step}>{steps[step]}</span>;
+}
+
 
 const SAMPLE_JD = `Senior Frontend Engineer — FinTech Startup
 
@@ -294,7 +314,7 @@ export default function UploadPage() {
                   disabled={loading} 
                   style={{ background: "linear-gradient(90deg, #9333ea, #a855f7)", border: "none", padding: "14px 36px", borderRadius: 8, color: "#fff", fontSize: 15, fontWeight: 600, cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1, display: "flex", alignItems: "center", gap: 8, boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}
                 >
-                  {loading ? <><Spinner size={18} /> Analysing…</> : "Start Assessment →"}
+                  {loading ? <><Spinner size={18} /> <LoadingSequence steps={UPLOAD_LOADING_STEPS} /></> : "Start Assessment →"}
                 </button>
               </div>
             </div>

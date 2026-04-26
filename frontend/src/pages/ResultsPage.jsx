@@ -9,6 +9,13 @@ export default function ResultsPage() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const copyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   useEffect(() => {
     api.getResults(sessionId)
@@ -68,6 +75,9 @@ export default function ResultsPage() {
           <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>SkillSage</span>
         </div>
         <div style={{ display: "flex", gap: 16 }}>
+          <button onClick={copyLink} style={{ background: "rgba(255,255,255,0.05)", border: "1px solid var(--glass-border)", borderRadius: 6, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, transition: "background 0.2s" }} onMouseOver={e => e.currentTarget.style.background = "rgba(255,255,255,0.1)"} onMouseOut={e => e.currentTarget.style.background = "rgba(255,255,255,0.05)"}>
+            <span className="mobile-hide" style={{ fontSize: 16 }}>{copied ? "✓" : "🔗"}</span> {copied ? "Copied!" : "Share Link"}
+          </button>
           <button onClick={() => window.print()} style={{ background: "linear-gradient(90deg, #9333ea, #d946ef)", border: "none", borderRadius: 6, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 0 15px rgba(168,85,247,0.4)" }}>
             <span className="mobile-hide" style={{ fontSize: 16 }}>↓</span> Print
           </button>
