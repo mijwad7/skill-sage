@@ -9,6 +9,17 @@ An AI-driven skill gap analyser that interviews candidates skill-by-skill and ge
 3. **Scored Results** — each skill is scored 0–100 with a band label
 4. **Learning Roadmap** — week-by-week plan with curated free resources
 
+## ✨ Premium Features & Enhancements
+
+This project goes beyond a standard CRUD application by integrating advanced AI reasoning and premium UX features:
+
+- **🕵️ Claim vs. Reality Engine**: Automatically cross-references resume claims against actual assessment performance to detect *Inflated Claims*, *Hidden Gaps*, and *Verified Strengths*.
+- **🧠 Adaptive Reasoning Trace**: Exposes the AI's internal logic during the interview (e.g., *"Candidate missed state synchronization. Escalating to a scenario-based question."*) so users can see the difficulty adapting in real-time.
+- **🎯 AI-Driven Hire Recommendation**: Synthesizes the final scores against the Job Description to output a definitive role readiness percentage and an actionable HR recommendation (e.g., *"Hire with targeted upskilling"*).
+- **🎙️ Hands-Free Interviewing**: Integrated Web Speech APIs provide seamless Text-to-Speech (TTS) and Speech-to-Text (STT) capabilities for a natural, conversational interview experience.
+- **🔗 Recruiter Share Links**: Generates secure, unguessable URLs for friction-free sharing of candidate results with hiring managers.
+- **📱 Fluid Glassmorphism UI**: A fully responsive, modern neon-gradient aesthetic featuring dynamic micro-animations and intelligent loading sequences that transform dead waiting time into a showcase of the AI's processing logic.
+
 ## Assessment Depths
 
 | Mode | Questions/skill | Use case |
