@@ -2,6 +2,7 @@ import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { Button, TextArea, ErrorBanner, Spinner } from "../components/ui";
+import heroNetwork from "../assets/hero_network.png";
 
 const SAMPLE_JD = `Senior Frontend Engineer — FinTech Startup
 
@@ -98,7 +99,7 @@ export default function UploadPage() {
   };
 
   const scrollToForm = () => {
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    formRef.current?.scrollIntoView({ block: "start" });
   };
 
   const selectedLevel = DEPTH_LEVELS.find(d => d.id === depth);
@@ -110,57 +111,89 @@ export default function UploadPage() {
       <div style={{ position: "absolute", top: 100, left: -200, width: 600, height: 600, background: "radial-gradient(circle, var(--pink-g) 0%, transparent 60%)", opacity: 0.15, pointerEvents: "none" }} />
 
       {/* Header */}
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 60px", position: "relative", zIndex: 10 }}>
+      <header className="mobile-padding" style={{ 
+        display: "flex", 
+        justifyContent: "space-between", 
+        alignItems: "center", 
+        padding: "16px 60px", 
+        position: "sticky", 
+        top: 0, 
+        zIndex: 100,
+        background: "rgba(6, 6, 8, 0.7)",
+        backdropFilter: "blur(12px)",
+        borderBottom: "1px solid var(--glass-border)"
+      }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, var(--purple), var(--pink))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold" }}>S</div>
           <span style={{ fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em" }}>SkillSage</span>
         </div>
-        <nav style={{ display: "flex", gap: 40, fontSize: 14, color: "var(--text2)", fontWeight: 500 }}>
-          <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseOver={e => e.target.style.color = "#fff"} onMouseOut={e => e.target.style.color = "var(--text2)"}>Features</span>
-          <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseOver={e => e.target.style.color = "#fff"} onMouseOut={e => e.target.style.color = "var(--text2)"}>Pricing</span>
-          <span style={{ cursor: "pointer", transition: "color 0.2s" }} onMouseOver={e => e.target.style.color = "#fff"} onMouseOut={e => e.target.style.color = "var(--text2)"}>About</span>
-        </nav>
-        <button style={{ background: "linear-gradient(90deg, #9333ea, #c084fc)", border: "none", padding: "8px 24px", borderRadius: 6, color: "#fff", fontWeight: 600, cursor: "pointer", boxShadow: "0 0 20px rgba(168,85,247,0.4)" }}>
-          Login
-        </button>
+        <a 
+          href="#assessment-form"
+          style={{ 
+            background: "linear-gradient(90deg, #9333ea, #c084fc)", 
+            border: "none", 
+            padding: "8px 20px", 
+            borderRadius: 8, 
+            color: "#fff", 
+            fontWeight: 600, 
+            cursor: "pointer", 
+            boxShadow: "0 0 20px rgba(168,85,247,0.3)",
+            fontSize: 14,
+            transition: "transform 0.2s",
+            textDecoration: "none"
+          }}
+          onMouseOver={e => e.target.style.transform = "translateY(-1px)"}
+          onMouseOut={e => e.target.style.transform = "translateY(0)"}
+        >
+          Get Started →
+        </a>
       </header>
 
       <main style={{ maxWidth: 1100, margin: "0 auto", padding: "60px 24px", position: "relative", zIndex: 1 }}>
         {/* Hero Section */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 100 }} className="animate-fade-up">
-          <div style={{ maxWidth: 540 }}>
-            <h1 style={{ fontSize: 58, fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", marginBottom: 24 }}>
+        <div className="mobile-stack animate-fade-up" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 100, gap: 40 }}>
+          <div className="mobile-center" style={{ maxWidth: 540 }}>
+            <h1 className="mobile-full" style={{ fontSize: "clamp(32px, 8vw, 58px)", fontWeight: 800, lineHeight: 1.1, letterSpacing: "-0.03em", marginBottom: 24 }}>
               <span className="text-gradient-pink">Master</span> Your <br/>
               Career Path with <br/>
               <span className="text-gradient">AI Precision.</span>
             </h1>
-            <p style={{ fontSize: 18, color: "var(--text2)", lineHeight: 1.6, marginBottom: 40 }}>
+            <p style={{ fontSize: "clamp(16px, 4vw, 18px)", color: "var(--text2)", lineHeight: 1.6, marginBottom: 40 }}>
               Find Your Skill Gaps. Get a Personalised Roadmap.<br/>
               Practice with adaptive questions per skill, ranging from easy to hard.
             </p>
-            <button 
-              onClick={scrollToForm}
-              style={{ background: "linear-gradient(90deg, #9333ea, #a855f7)", border: "none", padding: "14px 32px", borderRadius: 8, color: "#fff", fontSize: 16, fontWeight: 600, cursor: "pointer", boxShadow: "0 0 30px rgba(168,85,247,0.5)", transition: "transform 0.2s" }}
+            <a 
+              href="#assessment-form"
+              style={{ background: "linear-gradient(90deg, #9333ea, #a855f7)", border: "none", padding: "14px 32px", borderRadius: 8, color: "#fff", fontSize: 16, fontWeight: 600, cursor: "pointer", boxShadow: "0 0 30px rgba(168,85,247,0.5)", transition: "transform 0.2s", textDecoration: "none", display: "inline-block" }}
               onMouseOver={e => e.target.style.transform = "translateY(-2px)"}
               onMouseOut={e => e.target.style.transform = "translateY(0)"}
             >
               Get Your Assessment
-            </button>
+            </a>
           </div>
-          <div style={{ flex: 1, position: "relative", height: 400, display: "flex", justifyContent: "center", alignItems: "center" }}>
-            {/* Abstract brain/network graphic placeholder */}
-            <div style={{ width: 340, height: 340, borderRadius: "50%", background: "radial-gradient(circle, rgba(168,85,247,0.15) 0%, transparent 70%)", border: "1px solid rgba(168,85,247,0.3)", position: "relative", animation: "pulse 4s infinite" }}>
-               <div style={{ position: "absolute", top: "20%", left: "20%", width: 60, height: 60, borderRadius: "50%", background: "var(--cyan)", filter: "blur(40px)" }} />
-               <div style={{ position: "absolute", bottom: "20%", right: "20%", width: 80, height: 80, borderRadius: "50%", background: "var(--pink)", filter: "blur(50px)" }} />
-               <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text2)", fontSize: 12 }}>
-                  [ AI Network Core ]
-               </div>
+          <div className="mobile-full" style={{ flex: 1, position: "relative", minHeight: 300, display: "flex", justifyContent: "center", alignItems: "center" }}>
+            {/* AI Network visualization image */}
+            <div style={{ position: "relative", width: "min(450px, 90vw)", height: "min(450px, 90vw)" }}>
+              <div style={{ position: "absolute", inset: 0, borderRadius: "50%", background: "radial-gradient(circle, var(--purple) 0%, transparent 70%)", opacity: 0.2, filter: "blur(60px)", animation: "pulse 4s infinite" }} />
+              <img 
+                src={heroNetwork} 
+                alt="AI Network Visualization" 
+                style={{ 
+                  width: "100%", 
+                  height: "100%", 
+                  objectFit: "contain", 
+                  position: "relative", 
+                  zIndex: 2,
+                  filter: "drop-shadow(0 0 30px rgba(168,85,247,0.3))",
+                  animation: "fadeUp 1.2s var(--ease)"
+                }} 
+              />
             </div>
           </div>
         </div>
 
         {/* Features Row */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 24, marginBottom: 120 }}>
+        <div className="responsive-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", marginBottom: 120 }}>
           {[
             { icon: "🔍", title: "Identify Gaps", desc: "Pinpoint missing skills with precision using our AI analysis.", color: "var(--cyan)" },
             { icon: "📈", title: "Personalized Roadmap", desc: "Receive a week-by-week learning plan tailored to your career goals.", color: "var(--purple-l)" },
@@ -175,16 +208,16 @@ export default function UploadPage() {
         </div>
 
         {/* Assessment Form Area */}
-        <div ref={formRef} style={{ scrollMarginTop: 100, marginBottom: 100 }}>
+        <div id="assessment-form" ref={formRef} style={{ scrollMarginTop: 100, marginBottom: 100 }}>
           <div style={{ textAlign: "center", marginBottom: 40 }}>
             <h2 style={{ fontSize: 36, fontWeight: 700, letterSpacing: "-0.02em" }}>Start Your Journey</h2>
             <p style={{ color: "var(--text2)", marginTop: 8 }}>Upload your job description and resume to get started.</p>
           </div>
 
-          <div className="glass-card" style={{ padding: 40, borderRadius: 24, position: "relative", overflow: "hidden" }}>
+          <div className="glass-card mobile-padding" style={{ padding: 40, borderRadius: 24, position: "relative", overflow: "hidden" }}>
             <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: 4, background: "linear-gradient(90deg, var(--cyan), var(--purple), var(--pink))" }} />
             
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
+            <div className="mobile-stack" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 32 }}>
               <h3 style={{ fontSize: 20, fontWeight: 600 }}>Assessment Details</h3>
               <button onClick={loadSample} style={{ fontSize: 13, color: "var(--cyan)", background: "rgba(34,211,238,0.1)", border: "1px solid rgba(34,211,238,0.2)", borderRadius: 6, padding: "6px 14px", cursor: "pointer", transition: "all 0.2s" }} onMouseOver={e => e.target.style.background = "rgba(34,211,238,0.2)"} onMouseOut={e => e.target.style.background = "rgba(34,211,238,0.1)"}>
                 Load sample data ↗
@@ -192,7 +225,7 @@ export default function UploadPage() {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 24 }}>
+              <div className="responsive-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))" }}>
                 <TextArea
                   label="Job Description"
                   value={jd}
@@ -216,7 +249,7 @@ export default function UploadPage() {
                 <div style={{ fontSize: 14, fontWeight: 600, marginBottom: 12, color: "#fff" }}>
                   Assessment Depth
                 </div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16 }}>
+                <div className="responsive-grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16 }}>
                   {DEPTH_LEVELS.map(level => {
                     const isSelected = depth === level.id;
                     return (
@@ -231,7 +264,8 @@ export default function UploadPage() {
                           cursor: "pointer",
                           textAlign: "left",
                           transition: "all 0.2s ease",
-                          boxShadow: isSelected ? `0 0 20px ${level.color}20` : "none"
+                          boxShadow: isSelected ? `0 0 20px ${level.color}20` : "none",
+                          width: "100%"
                         }}
                       >
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
@@ -269,12 +303,12 @@ export default function UploadPage() {
       </main>
 
       {/* Footer */}
-      <footer style={{ borderTop: "1px solid var(--border)", padding: "40px 60px", marginTop: 60, display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--text3)", fontSize: 13 }}>
+      <footer className="mobile-stack mobile-padding" style={{ borderTop: "1px solid var(--border)", padding: "40px 60px", marginTop: 60, display: "flex", justifyContent: "space-between", alignItems: "center", color: "var(--text3)", fontSize: 13 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ width: 20, height: 20, borderRadius: 4, background: "linear-gradient(135deg, var(--purple), var(--pink))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: 10, color: "#fff" }}>S</div>
           <span style={{ fontWeight: 600, color: "var(--text2)" }}>SkillSage</span>
         </div>
-        <div>© 2024 SkillSage. All rights reserved.</div>
+        <div className="mobile-center">© 2024 SkillSage. All rights reserved.</div>
       </footer>
     </div>
   );

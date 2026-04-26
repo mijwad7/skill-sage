@@ -49,44 +49,40 @@ export default function ResultsPage() {
       <div style={{ position: "absolute", bottom: -200, right: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--cyan) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />
 
       {/* Header */}
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "20px 40px", borderBottom: "1px solid var(--glass-border)", background: "rgba(6,6,8,0.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10 }}>
+      <header className="mobile-padding" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "16px 40px", borderBottom: "1px solid var(--glass-border)", background: "rgba(6,6,8,0.8)", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 28, height: 28, borderRadius: 8, background: "linear-gradient(135deg, var(--purple), var(--pink))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: 12 }}>S</div>
           <span style={{ fontSize: 18, fontWeight: 700, letterSpacing: "-0.02em" }}>SkillSage</span>
         </div>
         <div style={{ display: "flex", gap: 16 }}>
           <button onClick={() => window.print()} style={{ background: "linear-gradient(90deg, #9333ea, #d946ef)", border: "none", borderRadius: 6, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 0 15px rgba(168,85,247,0.4)" }}>
-            <span style={{ fontSize: 16 }}>↓</span> Download PDF Report
-          </button>
-          <button style={{ background: "linear-gradient(90deg, #3b82f6, #06b6d4)", border: "none", borderRadius: 6, padding: "8px 16px", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 0 15px rgba(59,130,246,0.4)" }}>
-            Share Profile
+            <span className="mobile-hide" style={{ fontSize: 16 }}>↓</span> Print
           </button>
         </div>
       </header>
 
       <main style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px", position: "relative", zIndex: 1 }}>
-        
-        {/* Top Summary Row */}
-        <div className="animate-fade-up" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 40, marginBottom: 60 }}>
+           {/* Top Summary Row */}
+        <div className="mobile-stack animate-fade-up" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 40, marginBottom: 60 }}>
           {/* Top Strength */}
-          <div className="glass-card" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
+          <div className="glass-card mobile-full" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(34,211,238,0.1)", border: "1px solid rgba(34,211,238,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>⚛️</div>
             <div>
               <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Top Strength</div>
               <div style={{ fontSize: 16, fontWeight: 600 }}>{topStrength.skill} ({topStrength.band})</div>
             </div>
           </div>
-
+ 
           {/* Average Score Ring */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: 180, height: 180, borderRadius: "50%", background: "var(--glass-bg)", border: "4px solid rgba(168,85,247,0.3)", position: "relative", boxShadow: "0 0 40px rgba(168,85,247,0.2)" }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: 180, height: 180, borderRadius: "50%", background: "var(--glass-bg)", border: "4px solid rgba(168,85,247,0.3)", position: "relative", boxShadow: "0 0 40px rgba(168,85,247,0.2)", flexShrink: 0 }}>
              {/* Simulated ring progress */}
              <div style={{ position: "absolute", top: -4, left: -4, right: -4, bottom: -4, borderRadius: "50%", border: "4px solid transparent", borderTopColor: "var(--pink)", borderRightColor: "var(--purple)", transform: `rotate(${Math.min(summary.avg_score || 0, 100) * 3.6 - 90}deg)`, transition: "transform 1s var(--ease)" }} />
              <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Avg Score</div>
              <div style={{ fontSize: 42, fontWeight: 800, lineHeight: 1 }}>{summary.avg_score || 0}<span style={{ fontSize: 24, color: "var(--text3)" }}>%</span></div>
           </div>
-
+ 
           {/* Biggest Gap */}
-          <div className="glass-card" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
+          <div className="glass-card mobile-full" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
             <div style={{ width: 48, height: 48, borderRadius: 12, background: "rgba(244,114,182,0.1)", border: "1px solid rgba(244,114,182,0.2)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24 }}>📉</div>
             <div>
               <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 4 }}>Biggest Gap</div>
@@ -125,7 +121,7 @@ export default function ResultsPage() {
         {learning_plan.length > 0 && (
           <div>
             <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 20 }}>Personalized Learning Roadmap</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(340px, 1fr))", gap: 20 }}>
+            <div className="responsive-grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 20 }}>
               {learning_plan.map((plan, i) => (
                 <div key={plan.skill} className="glass-card animate-fade-up" style={{ animationDelay: `${i * 0.1}s`, padding: 24, borderRadius: 16, borderLeft: `4px solid var(--purple)`, position: "relative" }}>
                   <div style={{ fontSize: 12, color: "var(--text3)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>

@@ -106,17 +106,17 @@ export default function AssessmentPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", fontFamily: "var(--font)", display: "flex", flexDirection: "column" }}>
       {/* Header */}
-      <header style={{ padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)" }}>
+      <header className="mobile-padding" style={{ padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)" }}>
         <button onClick={() => navigate("/")} style={{ background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: "var(--text2)", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
           ✕ Exit
         </button>
         <div style={{ fontSize: 14, color: "var(--text2)" }}>Skill Assessment</div>
       </header>
 
-      <div style={{ display: "flex", flex: 1, overflow: "hidden", padding: 24, gap: 24, maxWidth: 1400, margin: "0 auto", width: "100%" }}>
+      <div className="mobile-stack mobile-padding" style={{ display: "flex", flex: 1, overflow: "hidden", padding: 24, gap: 24, maxWidth: 1400, margin: "0 auto", width: "100%" }}>
         
         {/* Left Sidebar */}
-        <div style={{ width: 320, display: "flex", flexDirection: "column", gap: 24 }}>
+        <div className="mobile-full" style={{ width: 320, display: "flex", flexDirection: "column", gap: 24, flexShrink: 0 }}>
           <div className="glass-card" style={{ padding: 24, borderRadius: 16, flex: 1 }}>
             <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 24 }}>Progress & Skills</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "relative" }}>
