@@ -51,6 +51,7 @@ Return a JSON object in this exact shape:
       "current_band": "Developing",
       "current_score": 45,
       "weeks_needed": 3,
+      "role_relevance": "Required for building interactive, component-based user interfaces expected in the target frontend role.",
       "weekly_goals": [
         "Week 1: Core hooks (useState, useEffect) - build a todo app",
         "Week 2: React Router + Context API - add routing and global state",
@@ -114,6 +115,7 @@ def _fallback_plan(scores: dict) -> dict:
             "current_band": score_band(score),
             "current_score": score,
             "weeks_needed": 4,
+            "role_relevance": f"Foundational skill required for this position based on the provided job description.",
             "weekly_goals": ["Search YouTube and official docs for this skill"],
             "resources": [{"title": "Google it", "url": "https://google.com", "type": "docs"}],
             "mini_project": f"Build a small project that demonstrates {skill}",

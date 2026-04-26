@@ -183,6 +183,13 @@ export default function ResultsPage() {
                   </div>
                   <h3 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12, lineHeight: 1.4 }}>Focus: {plan.current_band} to Proficiency</h3>
                   
+                  {plan.role_relevance && (
+                    <div style={{ marginBottom: 16, padding: "8px 12px", background: "rgba(168,85,247,0.1)", borderRadius: 8, borderLeft: "2px solid var(--purple-l)" }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, color: "var(--purple-l)", marginBottom: 4, textTransform: "uppercase", letterSpacing: "0.05em" }}>Why this matters for this role</div>
+                      <div style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.5 }}>{plan.role_relevance}</div>
+                    </div>
+                  )}
+
                   {plan.weekly_goals && plan.weekly_goals.length > 0 && (
                     <div style={{ marginBottom: 16 }}>
                        <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text2)", marginBottom: 6 }}>Key Goal</div>
