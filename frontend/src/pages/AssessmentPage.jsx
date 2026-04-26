@@ -24,7 +24,10 @@ export default function AssessmentPage() {
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [speakingId, setSpeakingId] = useState(null);
+  const [isListening, setIsListening] = useState(false);
   const synthRef = useRef(window.speechSynthesis);
+  const recognitionRef = useRef(null);
+  const originalAnswerRef = useRef("");
 
   useEffect(() => {
     if (!initial) {
@@ -107,6 +110,44 @@ export default function AssessmentPage() {
 
     setSpeakingId(id);
     synthRef.current.speak(utterance);
+  };
+ 
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+      setIsListening(false);
+      return;
+    }
+ 
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition is not supported in this browser. Try Chrome or Edge.");
+      return;
+    }
+ 
+    const recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = "en-US";
+ 
+    recognition.onstart = () => {
+      setIsListening(true);
+      originalAnswerRef.current = answer;
+    };
+    recognition.onresult = (event) => {
+      let sessionTranscript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        sessionTranscript += event.results[i][0].transcript;
+      }
+      
+      const base = originalAnswerRef.current.trim();
+      setAnswer(base ? `${base} ${sessionTranscript}` : sessionTranscript);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+ 
+    recognitionRef.current = recognition;
+    recognition.start();
   };
 
   const handleKey = (e) => {
@@ -265,7 +306,32 @@ export default function AssessmentPage() {
             {/* Input Area */}
             <div style={{ padding: 24, background: "rgba(6,6,8,0.6)", borderTop: "1px solid var(--glass-border)" }}>
               {error && <div style={{ color: "var(--red-l)", fontSize: 13, marginBottom: 12 }}>{error}</div>}
-              <div style={{ display: "flex", gap: 12, background: "var(--bg3)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 12, padding: "8px", boxShadow: "0 0 20px rgba(168,85,247,0.1)", transition: "border-color 0.2s" }} onFocus={e => e.currentTarget.style.borderColor = "var(--purple)"} onBlur={e => e.currentTarget.style.borderColor = "rgba(168,85,247,0.4)"}>
+              <div style={{ display: "flex", gap: 12, background: "var(--bg3)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 12, padding: "8px", boxShadow: isListening ? "0 0 20px rgba(168,85,247,0.4)" : "0 0 20px rgba(168,85,247,0.1)", transition: "all 0.2s" }} onFocus={e => e.currentTarget.style.borderColor = "var(--purple)"} onBlur={e => e.currentTarget.style.borderColor = "rgba(168,85,247,0.4)"}>
+                <button
+                  onClick={toggleListening}
+                  style={{
+                    background: isListening ? "var(--purple)" : "rgba(255,255,255,0.05)",
+                    border: "none",
+                    borderRadius: 8,
+                    width: 44,
+                    height: 44,
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    color: isListening ? "#fff" : "var(--text3)",
+                    transition: "all 0.2s",
+                    flexShrink: 0
+                  }}
+                  title={isListening ? "Stop listening" : "Dictate your answer"}
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                  </svg>
+                </button>
                 <textarea
                   ref={inputRef}
                   value={answer}

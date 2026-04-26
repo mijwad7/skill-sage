@@ -234,7 +234,7 @@ def extract_text_view(request):
                 
             image_part = types.Part.from_bytes(data=file_content, mime_type=mime_type)
             response = client.models.generate_content(
-                model="gemini-2.5-flash-lite",
+                model="gemini-2.5-flash",
                 contents=["Extract and return all the readable text from this image as raw text. Do not add any conversational filler. Structure it exactly as it appears in the image.", image_part]
             )
             text = response.text
