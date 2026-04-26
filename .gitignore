@@ -49,3 +49,7 @@ desktop.ini
 htmlcov/
 .pytest_cache/
 .tox/
+
+# ── Build/Generated Assets ──────────────────────────────────────────────────
+generate_brief.js
+screenshot_*.png

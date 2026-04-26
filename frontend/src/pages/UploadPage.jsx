@@ -250,16 +250,16 @@ export default function UploadPage() {
                   label="Job Description"
                   value={jd}
                   onChange={setJd}
-                  placeholder="Paste the full job description here…"
-                  hint="Tip: Include the required/preferred skills section for best results."
+                  placeholder="Paste the job description or drag-and-drop a PDF/image file…"
+                  hint="Supported formats: plain text, PDF, DOCX, PNG, JPG."
                   minRows={10}
                 />
                 <TextArea
                   label="Your Resume"
                   value={resume}
                   onChange={setResume}
-                  placeholder="Paste your resume as plain text here…"
-                  hint="Plain text works best. You can also drag-and-drop a .txt file."
+                  placeholder="Paste your resume or drag-and-drop your file here…"
+                  hint="Supported formats: plain text, PDF, DOCX, PNG, JPG."
                   minRows={10}
                 />
               </div>
