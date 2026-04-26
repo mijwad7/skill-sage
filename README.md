@@ -35,7 +35,7 @@ This project goes beyond a standard CRUD application by integrating advanced AI 
 | Layer | Technology |
 |---|---|
 | Backend | Django 4.2 + Django REST Framework |
-| AI | Google Gemini 2.5 Flash Lite (via `google-genai`) |
+| AI | Google Gemini 2.5 Flash (via `google-genai`) |
 | Frontend | React 18 + Vite + React Router |
 | Database | SQLite (dev) / PostgreSQL (prod) |
 
@@ -51,8 +51,8 @@ This project goes beyond a standard CRUD application by integrating advanced AI 
 ### 1. Clone the repo
 
 ```bash
-git clone <your-repo-url>
-cd skills
+git clone https://github.com/mijwad7/skill-sage.git
+cd skill-sage
 ```
 
 ### 2. Backend setup
@@ -100,7 +100,7 @@ Frontend runs at `http://localhost:5173`
 ## Project Structure
 
 ```
-skills/
+skill-sage/
 ├── backend/
 │   ├── backend/          # Django settings, URLs, WSGI
 │   ├── core/             # Session model, views, migrations
@@ -109,7 +109,8 @@ skills/
 │   │   ├── gap_analyser.py      # Identifies skill gaps to assess
 │   │   ├── assessment_agent.py  # Adaptive interview agent
 │   │   ├── scoring_engine.py    # Computes 0-100 scores
-│   │   └── plan_generator.py    # Generates learning roadmap
+│   │   ├── plan_generator.py    # Generates learning roadmap & hire recommendation
+│   │   └── verification_engine.py # Detects mismatches between claims and reality
 │   ├── requirements.txt
 │   └── .env.example
 └── frontend/
