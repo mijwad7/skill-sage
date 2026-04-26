@@ -23,6 +23,8 @@ export default function AssessmentPage() {
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [speakingId, setSpeakingId] = useState(null);
+  const synthRef = useRef(window.speechSynthesis);
 
   useEffect(() => {
     if (!initial) {
@@ -82,6 +84,29 @@ export default function AssessmentPage() {
       setError(e.message);
       setSubmitted(false);
     }
+  };
+
+  const toggleSpeech = (text, id) => {
+    if (speakingId === id) {
+      synthRef.current.cancel();
+      setSpeakingId(null);
+      return;
+    }
+
+    synthRef.current.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Pick a good female voice if available
+    const voices = synthRef.current.getVoices();
+    const preferredVoice = voices.find(v => v.name.includes("Google US English") || v.name.includes("Female")) || voices[0];
+    if (preferredVoice) utterance.voice = preferredVoice;
+    
+    utterance.rate = 1.05;
+    utterance.onend = () => setSpeakingId(null);
+    utterance.onerror = () => setSpeakingId(null);
+
+    setSpeakingId(id);
+    synthRef.current.speak(utterance);
   };
 
   const handleKey = (e) => {
@@ -174,18 +199,51 @@ export default function AssessmentPage() {
                     {isAgent && (
                       <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--purple-l)", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>AI</div>
                     )}
-                    <div style={{
-                      background: isAgent ? "var(--glass-bg)" : "transparent",
-                      border: isAgent ? "1px solid var(--glass-border)" : "1px solid var(--purple)",
-                      boxShadow: isAgent ? "none" : "0 0 15px rgba(168,85,247,0.15)",
-                      padding: "16px 20px",
-                      borderRadius: isAgent ? "0 16px 16px 16px" : "16px 0 16px 16px",
-                      maxWidth: "80%",
-                      fontSize: 15,
-                      lineHeight: 1.6,
-                      color: "#fff"
-                    }}>
-                      {msg.content}
+                    <div style={{ position: "relative", maxWidth: "80%" }}>
+                      <div style={{
+                        background: isAgent ? "var(--glass-bg)" : "transparent",
+                        border: isAgent ? "1px solid var(--glass-border)" : "1px solid var(--purple)",
+                        boxShadow: isAgent ? "none" : "0 0 15px rgba(168,85,247,0.15)",
+                        padding: "16px 20px",
+                        borderRadius: isAgent ? "0 16px 16px 16px" : "16px 0 16px 16px",
+                        fontSize: 15,
+                        lineHeight: 1.6,
+                        color: "#fff"
+                      }}>
+                        {msg.content}
+                      </div>
+                      
+                      {isAgent && (
+                        <button 
+                          onClick={() => toggleSpeech(msg.content, i)}
+                          style={{
+                            position: "absolute",
+                            right: -36,
+                            top: 0,
+                            background: "none",
+                            border: "none",
+                            color: speakingId === i ? "var(--purple-l)" : "var(--text3)",
+                            cursor: "pointer",
+                            padding: 8,
+                            transition: "color 0.2s",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center"
+                          }}
+                          onMouseOver={e => e.currentTarget.style.color = "var(--purple-l)"}
+                          onMouseOut={e => e.currentTarget.style.color = speakingId === i ? "var(--purple-l)" : "var(--text3)"}
+                          title={speakingId === i ? "Stop speaking" : "Listen to message"}
+                        >
+                          {speakingId === i ? (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2" /></svg>
+                          ) : (
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                            </svg>
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
                 );
