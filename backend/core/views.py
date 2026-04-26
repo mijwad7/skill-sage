@@ -176,12 +176,17 @@ def get_results(request, session_id):
         ]
         scored_skills.sort(key=lambda x: x["score"])  # weakest first
 
+        learning_plan_data = session.learning_plan or {}
+        roadmap = learning_plan_data.get("roadmap", []) if isinstance(learning_plan_data, dict) else learning_plan_data
+        recommendation = learning_plan_data.get("recommendation", None) if isinstance(learning_plan_data, dict) else None
+
         return JsonResponse({
             "session_id":    str(session.id),
             "status":        "complete",
             "scored_skills": scored_skills,
             "verification_insights": get_verification_insights(session),
-            "learning_plan": session.learning_plan or [],
+            "learning_plan": roadmap,
+            "hire_recommendation": recommendation,
             "summary": {
                 "total_skills":  len(scored_skills),
                 "avg_score":     round(sum(s["score"] for s in scored_skills) / len(scored_skills)) if scored_skills else 0,

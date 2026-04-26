@@ -31,34 +31,40 @@ def _clean_json(text):
     return text.strip("` \n\r\t")
 
 
-PLAN_PROMPT = """You are an expert learning coach. Generate a structured learning plan.
+PLAN_PROMPT = """You are an expert technical assessor and hiring manager. Generate a final hiring recommendation and a structured learning plan.
 Return ONLY valid JSON — no markdown, no explanation.
 
 Candidate skill scores (0-100): {scores_json}
 Target role extracted from JD: {job_context}
 Time available: 8 weeks
 
-For each skill with score below 80, generate a plan entry. Return a JSON array:
-[
-  {{
-    "skill": "React",
-    "priority": "high",
-    "current_band": "Developing",
-    "current_score": 45,
-    "weeks_needed": 3,
-    "weekly_goals": [
-      "Week 1: Core hooks (useState, useEffect) - build a todo app",
-      "Week 2: React Router + Context API - add routing and global state",
-      "Week 3: REST API integration + deploy to Vercel"
-    ],
-    "resources": [
-      {{"title": "Official React Docs", "url": "https://react.dev", "type": "docs"}},
-      {{"title": "React Full Course - freeCodeCamp", "url": "https://www.youtube.com/watch?v=bMknfKXIFA8", "type": "video"}},
-      {{"title": "The Road to React (free book)", "url": "https://www.roadtoreact.com", "type": "book"}}
-    ],
-    "mini_project": "Build a GitHub profile viewer: search users, show repos, save favourites to localStorage"
-  }}
-]
+Return a JSON object in this exact shape:
+{{
+  "recommendation": {{
+    "status": "Strong Hire" | "Hire with Upskilling" | "Borderline" | "No Hire",
+    "reasoning": "A professional, 1-2 sentence HR-friendly explanation of why, highlighting verified strengths vs critical gaps."
+  }},
+  "roadmap": [
+    {{
+      "skill": "React",
+      "priority": "high",
+      "current_band": "Developing",
+      "current_score": 45,
+      "weeks_needed": 3,
+      "weekly_goals": [
+        "Week 1: Core hooks (useState, useEffect) - build a todo app",
+        "Week 2: React Router + Context API - add routing and global state",
+        "Week 3: REST API integration + deploy to Vercel"
+      ],
+      "resources": [
+        {{"title": "Official React Docs", "url": "https://react.dev", "type": "docs"}},
+        {{"title": "React Full Course - freeCodeCamp", "url": "https://www.youtube.com/watch?v=bMknfKXIFA8", "type": "video"}},
+        {{"title": "The Road to React (free book)", "url": "https://www.roadtoreact.com", "type": "book"}}
+      ],
+      "mini_project": "Build a GitHub profile viewer: search users, show repos, save favourites to localStorage"
+    }}
+  ]
+}}
 
 Rules:
 - priority: "high" for required JD skills with score < 50, "medium" for preferred skills or score 50-70, "low" otherwise
@@ -93,15 +99,15 @@ def generate_plan(session, scores: dict) -> list:
             ),
         )
         plan = json.loads(_clean_json(response.text))
-        return plan if isinstance(plan, list) else []
+        return plan if isinstance(plan, dict) else _fallback_plan(scores)
     except Exception as e:
         logger.error("Plan generation failed: %s", e)
         return _fallback_plan(scores)
 
 
-def _fallback_plan(scores: dict) -> list:
+def _fallback_plan(scores: dict) -> dict:
     """Minimal fallback if LLM call fails."""
-    return [
+    roadmap = [
         {
             "skill": skill,
             "priority": "high" if score < 50 else "medium",
@@ -115,3 +121,12 @@ def _fallback_plan(scores: dict) -> list:
         for skill, score in scores.items()
         if score < 80
     ]
+    avg_score = sum(scores.values()) / max(len(scores), 1)
+    status = "Hire with Upskilling" if avg_score > 60 else "Borderline"
+    return {
+        "recommendation": {
+            "status": status,
+            "reasoning": "Fallback recommendation generated due to an AI processing error."
+        },
+        "roadmap": roadmap
+    }

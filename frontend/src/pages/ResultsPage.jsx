@@ -35,7 +35,20 @@ export default function ResultsPage() {
     );
   }
 
-  const { scored_skills = [], learning_plan = [], summary = {}, verification_insights = [] } = data || {};
+  const { scored_skills = [], learning_plan = [], summary = {}, verification_insights = [], hire_recommendation } = data || {};
+
+  // For older sessions that didn't generate hire_recommendation
+  const rec = hire_recommendation || {
+    status: (summary.avg_score || 0) > 75 ? "Strong Hire" : (summary.avg_score || 0) > 50 ? "Hire with targeted upskilling" : "Borderline",
+    reasoning: "Based on overall assessment performance across core role requirements."
+  };
+
+  const getStatusColor = (status) => {
+    if (status.includes("Strong")) return "var(--cyan)";
+    if (status.includes("Upskilling") || status.includes("targeted")) return "var(--purple-l)";
+    if (status.includes("Borderline")) return "var(--amber-l)";
+    return "var(--red-l)";
+  };
 
   // Find strongest and weakest skills based on actual scores
   const sortedSkills = [...scored_skills].sort((a, b) => b.score - a.score);
@@ -62,7 +75,18 @@ export default function ResultsPage() {
       </header>
 
       <main style={{ maxWidth: 1200, margin: "0 auto", padding: "40px 24px", position: "relative", zIndex: 1 }}>
-           {/* Top Summary Row */}
+        {/* Recommendation Header */}
+        <div className="glass-card animate-fade-up" style={{ padding: "32px", borderRadius: 20, marginBottom: 40, borderLeft: `6px solid ${getStatusColor(rec.status)}`, background: "linear-gradient(90deg, rgba(255,255,255,0.05) 0%, transparent 100%)" }}>
+           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 24 }}>
+             <div>
+               <div style={{ fontSize: 14, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 8 }}>Overall Role Readiness: <span style={{ color: "#fff", fontWeight: 700, fontSize: 16 }}>{summary.avg_score || 0}%</span></div>
+               <h1 style={{ fontSize: 32, fontWeight: 700, margin: "0 0 16px 0", color: getStatusColor(rec.status) }}>Recommendation: {rec.status}</h1>
+               <p style={{ fontSize: 16, color: "var(--text)", lineHeight: 1.6, maxWidth: 800, margin: 0 }}>{rec.reasoning}</p>
+             </div>
+           </div>
+        </div>
+
+        {/* Top Summary Row */}
         <div className="mobile-stack animate-fade-up" style={{ display: "flex", justifyContent: "center", alignItems: "center", gap: 40, marginBottom: 60 }}>
           {/* Top Strength */}
           <div className="glass-card mobile-full" style={{ flex: 1, maxWidth: 340, padding: 24, borderRadius: 16, display: "flex", alignItems: "center", gap: 16 }}>
