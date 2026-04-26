@@ -73,7 +73,7 @@ export default function AssessmentPage() {
       const newMsgs = [];
       if (data.feedback) {
         // Embed feedback organically before the next question to match UI
-        newMsgs.push({ role: "agent", content: data.feedback });
+        newMsgs.push({ role: "agent", content: data.feedback, insight: data.insight });
       }
       newMsgs.push({ role: "agent", content: data.content, skill: data.skill });
 
@@ -254,6 +254,25 @@ export default function AssessmentPage() {
                         {msg.content}
                       </div>
                       
+                      {msg.insight && (
+                        <div style={{
+                          marginTop: 8,
+                          padding: "10px 14px",
+                          borderRadius: 8,
+                          background: "rgba(255,255,255,0.03)",
+                          borderLeft: "2px solid var(--purple-l)",
+                          fontSize: 13,
+                          color: "var(--text2)",
+                          fontStyle: "italic",
+                          display: "flex",
+                          gap: 8,
+                          alignItems: "flex-start"
+                        }}>
+                          <span style={{ color: "var(--purple-l)", fontWeight: 600, fontStyle: "normal", flexShrink: 0 }}>Agent Insight:</span>
+                          <span style={{ lineHeight: 1.4 }}>{msg.insight}</span>
+                        </div>
+                      )}
+
                       {isAgent && (
                         <button 
                           onClick={() => toggleSpeech(msg.content, i)}

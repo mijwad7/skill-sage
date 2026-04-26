@@ -35,7 +35,7 @@ export default function ResultsPage() {
     );
   }
 
-  const { scored_skills = [], learning_plan = [], summary = {} } = data || {};
+  const { scored_skills = [], learning_plan = [], summary = {}, verification_insights = [] } = data || {};
 
   // Find strongest and weakest skills based on actual scores
   const sortedSkills = [...scored_skills].sort((a, b) => b.score - a.score);
@@ -116,6 +116,36 @@ export default function ResultsPage() {
             );
           })}
         </div>
+ 
+        {/* Verification Insights */}
+        {verification_insights && verification_insights.length > 0 && (
+          <div style={{ marginBottom: 60 }}>
+            <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 20 }}>Verification Insights</h2>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+              {verification_insights.map((insight, i) => (
+                <div key={i} className="glass-card animate-fade-up" style={{ 
+                  animationDelay: `${i * 0.1}s`, 
+                  padding: "24px", 
+                  borderRadius: 16,
+                  border: `1px solid ${insight.color}40`,
+                  background: `${insight.color}08`,
+                  position: "relative",
+                  overflow: "hidden"
+                }}>
+                  {/* Subtle Background Icon */}
+                  <div style={{ position: "absolute", right: -10, bottom: -10, fontSize: 80, opacity: 0.05, pointerEvents: "none" }}>{insight.icon}</div>
+                  
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
+                    <div style={{ width: 24, height: 24, borderRadius: "50%", background: insight.color, color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12 }}>{insight.icon}</div>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: insight.color }}>{insight.label}</span>
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 700, marginBottom: 8, color: "#fff" }}>{insight.skill}</div>
+                  <p style={{ fontSize: 14, color: "var(--text2)", lineHeight: 1.5, margin: 0 }}>{insight.message}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* 8-Week Roadmap */}
         {learning_plan.length > 0 && (

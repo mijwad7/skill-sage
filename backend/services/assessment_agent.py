@@ -137,7 +137,8 @@ The question MUST be fully written out — never cut it off mid-sentence.
   "evaluation": {{
     "score": <integer 1-10>,
     "feedback": "<one clear, specific sentence about the answer quality>",
-    "key_gap": "<the main concept missing, or null if answer was complete>"
+    "key_gap": "<the main concept missing, or null if answer was complete>",
+    "insight": "<one sentence internal reasoning of how you evaluated this and adapted your next question (e.g. 'Strong conceptual grasp detected. Escalating to architecture-level probing.')>"
   }},
   "next_question": "<your complete question text>"
 }}"""
@@ -211,7 +212,7 @@ def process_turn(session, user_answer: str) -> dict:
             pre_generated_question = combined.get("next_question", "").strip()
         except Exception as exc:
             logger.error("Combined API call failed: %s", exc)
-            evaluation = {"score": 5, "feedback": "Answer noted.", "key_gap": None}
+            evaluation = {"score": 5, "feedback": "Answer noted.", "key_gap": None, "insight": "Fallback logic engaged due to API error."}
             pre_generated_question = ""
     else:
         # Last question of assessment — just evaluate, no next question needed
@@ -219,7 +220,7 @@ def process_turn(session, user_answer: str) -> dict:
             evaluation = _evaluate_only(skill, session.pending_question, user_answer, session.current_difficulty)
         except Exception as exc:
             logger.error("Final evaluation failed: %s", exc)
-            evaluation = {"score": 5, "feedback": "Assessment complete.", "key_gap": None}
+            evaluation = {"score": 5, "feedback": "Assessment complete.", "key_gap": None, "insight": "Final evaluation fallback."}
         pre_generated_question = ""
 
     # ── Update session state based on ACTUAL score ────────────────────────────
@@ -232,6 +233,7 @@ def process_turn(session, user_answer: str) -> dict:
         "score":      score,
         "feedback":   evaluation["feedback"],
         "key_gap":    evaluation["key_gap"],
+        "insight":    evaluation.get("insight", "Adapted question based on response."),
         "difficulty": session.current_difficulty,
     })
     session.skill_histories = histories
@@ -256,7 +258,7 @@ def process_turn(session, user_answer: str) -> dict:
     if session.all_skills_done():
         session.status = "scoring"
         session.save()
-        return {"type": "complete", "feedback": evaluation["feedback"]}
+        return {"type": "complete", "feedback": evaluation["feedback"], "insight": evaluation.get("insight")}
 
     # ── Determine if the pre-generated question is still valid ───────────────
     actual_next_skill = session.current_skill()
@@ -293,6 +295,7 @@ def process_turn(session, user_answer: str) -> dict:
         "type":       "question",
         "content":    next_question,
         "feedback":   evaluation["feedback"],
+        "insight":    evaluation.get("insight", "Adapted question based on response."),
         "skill":      actual_next_skill,
         "progress":   session.progress(),
         "difficulty": actual_next_difficulty,
@@ -309,7 +312,7 @@ Answer: {answer}
 
 Score 1-10: 1-3=wrong/superficial, 4-6=partial, 7-8=mostly correct, 9-10=excellent
 
-{{"score": N, "feedback": "one sentence", "key_gap": "missing concept or null"}}"""
+{{"score": N, "feedback": "one sentence", "key_gap": "missing concept or null", "insight": "one sentence reasoning"}}"""
 
 SINGLE_QUESTION_PROMPT = """You are a technical interviewer. Generate exactly ONE complete question.
 Output only the question text — no preamble, no labels.
@@ -351,6 +354,7 @@ def _parse_evaluation(data: dict) -> dict:
         "score":    score,
         "feedback": str(data.get("feedback", "Answer noted.")).strip() or "Answer noted.",
         "key_gap":  data.get("key_gap"),
+        "insight":  str(data.get("insight", "Adapted question based on response.")).strip()
     }
 
 

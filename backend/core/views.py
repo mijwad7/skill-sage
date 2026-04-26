@@ -17,6 +17,7 @@ from google.genai import types
 
 from core.models import Session
 from services import skill_extractor, gap_analyser, assessment_agent, scoring_engine, plan_generator
+from services.verification_engine import get_verification_insights
 
 logger = logging.getLogger(__name__)
 
@@ -179,6 +180,7 @@ def get_results(request, session_id):
             "session_id":    str(session.id),
             "status":        "complete",
             "scored_skills": scored_skills,
+            "verification_insights": get_verification_insights(session),
             "learning_plan": session.learning_plan or [],
             "summary": {
                 "total_skills":  len(scored_skills),
