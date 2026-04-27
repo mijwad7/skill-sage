@@ -189,13 +189,16 @@ export default function AssessmentPage() {
         <button onClick={() => navigate("/")} style={{ background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: "var(--text2)", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
           ✕ Exit
         </button>
-        <div style={{ fontSize: 14, color: "var(--text2)" }}>Skill Assessment</div>
+        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+          <div style={{ fontSize: 14, color: "var(--text2)" }}>Skill Assessment</div>
+          <div className="mobile-only" style={{ fontSize: 12, color: "var(--purple-l)", fontWeight: 600 }}>{currentSkill}</div>
+        </div>
       </header>
 
-      <div className="mobile-stack mobile-padding" style={{ display: "flex", flex: 1, overflow: "hidden", padding: 24, gap: 24, maxWidth: 1400, margin: "0 auto", width: "100%" }}>
+      <div className="mobile-stack mobile-padding mobile-chat-main-container" style={{ display: "flex", flex: 1, overflow: "hidden", padding: 24, gap: 24, maxWidth: 1400, margin: "0 auto", width: "100%" }}>
         
         {/* Left Sidebar */}
-        <div className="mobile-full" style={{ width: 320, display: "flex", flexDirection: "column", gap: 24, flexShrink: 0 }}>
+        <div className="mobile-hide" style={{ width: 320, display: "flex", flexDirection: "column", gap: 24, flexShrink: 0 }}>
           <div className="glass-card" style={{ padding: 24, borderRadius: 16, flex: 1 }}>
             <div style={{ fontSize: 12, color: "var(--text2)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 24 }}>Progress & Skills</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 20, position: "relative" }}>
@@ -253,8 +256,8 @@ export default function AssessmentPage() {
                     {isAgent && (
                       <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(168,85,247,0.2)", border: "1px solid rgba(168,85,247,0.4)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--purple-l)", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>AI</div>
                     )}
-                    <div style={{ position: "relative", maxWidth: "80%" }}>
-                      <div style={{
+                    <div className="mobile-chat-bubble-container" style={{ position: "relative", maxWidth: "80%" }}>
+                      <div className="mobile-chat-bubble" style={{
                         background: isAgent ? "var(--glass-bg)" : "transparent",
                         border: isAgent ? "1px solid var(--glass-border)" : "1px solid var(--purple)",
                         boxShadow: isAgent ? "none" : "0 0 15px rgba(168,85,247,0.15)",
@@ -347,7 +350,7 @@ export default function AssessmentPage() {
             </div>
 
             {/* Input Area */}
-            <div style={{ padding: 24, background: "rgba(6,6,8,0.6)", borderTop: "1px solid var(--glass-border)" }}>
+            <div className="mobile-chat-input-area" style={{ padding: 24, background: "rgba(6,6,8,0.6)", borderTop: "1px solid var(--glass-border)" }}>
               {error && <div style={{ color: "var(--red-l)", fontSize: 13, marginBottom: 12 }}>{error}</div>}
               <div style={{ display: "flex", gap: 12, background: "var(--bg3)", border: "1px solid rgba(168,85,247,0.4)", borderRadius: 12, padding: "8px", boxShadow: isListening ? "0 0 20px rgba(168,85,247,0.4)" : "0 0 20px rgba(168,85,247,0.1)", transition: "all 0.2s" }} onFocus={e => e.currentTarget.style.borderColor = "var(--purple)"} onBlur={e => e.currentTarget.style.borderColor = "rgba(168,85,247,0.4)"}>
                 <button
@@ -386,11 +389,12 @@ export default function AssessmentPage() {
                   style={{ flex: 1, background: "transparent", border: "none", color: "#fff", fontSize: 15, outline: "none", resize: "none", padding: "8px 12px", fontFamily: "var(--font)", lineHeight: 1.5 }}
                 />
                 <button
+                  className="mobile-chat-send"
                   onClick={send}
                   disabled={!answer.trim() || typing || submitted}
                   style={{ background: "linear-gradient(135deg, var(--purple), var(--cyan))", border: "none", borderRadius: 8, padding: "0 24px", color: "#fff", fontWeight: 600, cursor: (!answer.trim() || typing || submitted) ? "not-allowed" : "pointer", opacity: (!answer.trim() || typing || submitted) ? 0.5 : 1, display: "flex", alignItems: "center", gap: 8 }}
                 >
-                  Send <span>↗</span>
+                  <span className="mobile-chat-send-text">Send</span> <span>↗</span>
                 </button>
               </div>
             </div>
