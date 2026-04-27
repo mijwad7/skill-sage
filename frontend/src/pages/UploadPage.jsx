@@ -328,7 +328,7 @@ export default function UploadPage() {
           <div style={{ width: 20, height: 20, borderRadius: 4, background: "linear-gradient(135deg, var(--purple), var(--pink))", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "bold", fontSize: 10, color: "#fff" }}>S</div>
           <span style={{ fontWeight: 600, color: "var(--text2)" }}>SkillSage</span>
         </div>
-        <div className="mobile-center">© 2024 SkillSage. All rights reserved.</div>
+        <div className="mobile-center">© 2026 SkillSage. All rights reserved.</div>
       </footer>
     </div>
   );
