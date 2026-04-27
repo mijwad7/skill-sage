@@ -91,7 +91,7 @@ def generate_plan(session, scores: dict) -> list:
 
     try:
         response = _get_client().models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
