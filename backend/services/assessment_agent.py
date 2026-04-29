@@ -77,7 +77,7 @@ def _call_api(prompt: str, json_mode: bool = False, retries: int = 3) -> str:
     for attempt in range(retries):
         try:
             response = _get_client().models.generate_content(
-                model="gemini-2.5-flash-lite",
+                model="gemini-2.5-flash",
                 contents=prompt,
                 config=config,
             )
