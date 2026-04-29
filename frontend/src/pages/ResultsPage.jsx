@@ -26,7 +26,7 @@ export default function ResultsPage() {
 
   if (loading) {
     return (
-      <div style={{ minHeight: "100vh", background: "#060608", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text2)" }}>
+      <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text2)" }}>
         <Spinner size={32} />
         <span style={{ marginLeft: 16 }}>Generating your personalised learning plan…</span>
       </div>
@@ -35,7 +35,7 @@ export default function ResultsPage() {
 
   if (error) {
     return (
-      <div style={{ minHeight: "100vh", background: "#060608", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "var(--red-l)" }}>
+      <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "var(--red-l)" }}>
         <div style={{ padding: 24, background: "rgba(220,38,38,0.1)", border: "1px solid var(--red)", borderRadius: 12 }}>{error}</div>
         <button onClick={() => navigate("/")} style={{ marginTop: 24, padding: "10px 20px", background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: "#fff", borderRadius: 8, cursor: "pointer" }}>← Start over</button>
       </div>
@@ -63,7 +63,7 @@ export default function ResultsPage() {
   const biggestGap = sortedSkills[sortedSkills.length - 1] || { skill: "N/A", band: "N/A" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", fontFamily: "var(--font)", paddingBottom: 80, position: "relative" }}>
+    <div style={{ color: "#fff", fontFamily: "var(--font)", paddingBottom: 80, position: "relative" }}>
       {/* Background Glows */}
       <div style={{ position: "absolute", top: -100, left: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--purple) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: -200, right: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--cyan) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />

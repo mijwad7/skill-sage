@@ -183,7 +183,7 @@ export default function AssessmentPage() {
   const currentSkill = progress?.skill || gaps[0];
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", fontFamily: "var(--font)", display: "flex", flexDirection: "column" }}>
+    <div style={{ height: "100%", color: "#fff", fontFamily: "var(--font)", display: "flex", flexDirection: "column" }}>
       {/* Header */}
       <header className="mobile-padding" style={{ padding: "16px 32px", display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid var(--glass-border)" }}>
         <button onClick={() => navigate("/")} style={{ background: "var(--glass-bg)", border: "1px solid var(--glass-border)", color: "var(--text2)", padding: "8px 16px", borderRadius: 8, cursor: "pointer", fontSize: 14 }}>
