@@ -60,7 +60,7 @@ def extract_skills(jd_text: str, resume_text: str) -> dict:
     prompt = EXTRACT_PROMPT.format(jd_text=jd_text[:4000], resume_text=resume_text[:4000])
     try:
         response = _get_client().models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-2.5-flash-lite",
             contents=prompt,
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
