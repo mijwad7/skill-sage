@@ -125,7 +125,7 @@ export default function UploadPage() {
   const selectedLevel = DEPTH_LEVELS.find(d => d.id === depth);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", position: "relative", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", position: "relative" }}>
       {/* Background glow effects */}
       <div style={{ position: "absolute", top: -200, right: -200, width: 600, height: 600, background: "radial-gradient(circle, var(--cyan-g) 0%, transparent 60%)", opacity: 0.15, pointerEvents: "none" }} />
       <div style={{ position: "absolute", top: 100, left: -200, width: 600, height: 600, background: "radial-gradient(circle, var(--pink-g) 0%, transparent 60%)", opacity: 0.15, pointerEvents: "none" }} />

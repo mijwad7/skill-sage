@@ -63,7 +63,7 @@ export default function ResultsPage() {
   const biggestGap = sortedSkills[sortedSkills.length - 1] || { skill: "N/A", band: "N/A" };
 
   return (
-    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", fontFamily: "var(--font)", paddingBottom: 80, position: "relative", overflowX: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "#060608", color: "#fff", fontFamily: "var(--font)", paddingBottom: 80, position: "relative" }}>
       {/* Background Glows */}
       <div style={{ position: "absolute", top: -100, left: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--purple) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: -200, right: -200, width: 800, height: 800, background: "radial-gradient(circle, var(--cyan) 0%, transparent 50%)", opacity: 0.1, pointerEvents: "none" }} />
